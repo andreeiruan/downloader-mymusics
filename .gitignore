@@ -1,0 +1,6 @@
+node_modules/
+.env
+dist/
+*.mp3
+*.mp4
+.vscode/
