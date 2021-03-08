@@ -42,16 +42,16 @@ export class DownloaderUseCase {
     return parts
   }
 
-  async execute (): Promise<HttpResponse> {
+  async execute (token: string): Promise<HttpResponse> {
     try {
-      const playlists = await this.spotifySvc.getPlaylists()
+      const playlists = await this.spotifySvc.getPlaylists(token)
 
       const musics: MusicDocument[] = []
 
       for (const p of playlists) {
         const playlist = await this.playlistRepository.findOrCreate(p)
 
-        const musicsInPlaylist = await this.spotifySvc.getMusicsInPlaylist(playlist)
+        const musicsInPlaylist = await this.spotifySvc.getMusicsInPlaylist(playlist, token)
 
         const m = await Promise.all(musicsInPlaylist.map(async m => {
           const music = await this.musicRepository.findOrCreate(m)
@@ -78,7 +78,7 @@ export class DownloaderUseCase {
       if (error.message === 'Unauthorized') {
         return {
           status: 401,
-          message: 'Unauthorized'
+          message: 'Unauthorized Spotify access'
         }
       }
 

@@ -10,15 +10,14 @@ export class SpotifyService {
       baseURL: 'https://api.spotify.com/v1',
       validateStatus: (status) => status < 500
     })
-
-    this.api.interceptors.request.use(req => {
-      req.headers.Authorization = `Bearer ${process.env.TOKEN}`
-      return req
-    })
   }
 
-  async getPlaylists (): Promise<Playlist[]> {
-    const { data, status } = await this.api.get('/me/playlists')
+  async getPlaylists (token: string): Promise<Playlist[]> {
+    const { data, status } = await this.api.get('/me/playlists', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 
     if (status !== 200) {
       throw new Error('Unauthorized')
@@ -29,15 +28,19 @@ export class SpotifyService {
         name: p.name,
         length: p.tracks.total
       }))
-      // Armazenar cada plyslits no db
+
       return playlists
     }
 
     return []
   }
 
-  async getMusicsInPlaylist (playlist: Playlist): Promise<Music[]> {
-    const { data } = await this.api.get(`/playlists/${playlist.idSpotify}/tracks`)
+  async getMusicsInPlaylist (playlist: Playlist, token: string): Promise<Music[]> {
+    const { data } = await this.api.get(`/playlists/${playlist.idSpotify}/tracks`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 
     const musics: Music[] = []
     if (data.items) {
@@ -55,7 +58,12 @@ export class SpotifyService {
     if (data.total > 100) {
       let offset = 100
       while (offset <= data.total) {
-        const { data } = await this.api.get(`/playlists/${playlist.idSpotify}/tracks`, { params: { offset } })
+        const { data } = await this.api.get(`/playlists/${playlist.idSpotify}/tracks`, {
+          params: { offset },
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         const musicsApiResponse = data.items.map((i: any) => ({
           name: i.track.name,
           artist: i.track.artists[0].name,
@@ -69,7 +77,6 @@ export class SpotifyService {
       }
     }
 
-    // Armazenar cada musica no db
     return musics
   }
 }

@@ -44,9 +44,11 @@ export class DownloadConvertMusic {
   async handle (job: Job): Promise<any> {
     const { music } = job.data
 
-    const musicRepository = new MusicRepository(MusicSchema)
-    await VideoUtilities.downloader(music)
+    if (!music.completed) {
+      const musicRepository = new MusicRepository(MusicSchema)
+      await VideoUtilities.downloader(music)
 
-    await musicRepository.confirmCompleted(music)
+      await musicRepository.confirmCompleted(music)
+    }
   }
 }

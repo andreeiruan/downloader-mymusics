@@ -26,7 +26,8 @@ class Application {
     this.app.use(express.json())
 
     this.app.get('/downloader', async (req, res) => {
-      const { status, data, message } = await this.downloaderUseCase.execute()
+      const { token } = req.query
+      const { status, data, message } = await this.downloaderUseCase.execute(String(token))
 
       return res.status(status).json({ message, data })
     })

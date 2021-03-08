@@ -18,8 +18,13 @@ export class VideoUtilities {
     videoConverter.setFfmpegPath(ffmpegStatic, (err) => {
       if (err) throw err
     })
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const dir = `${this.dirMusics}/${this.formatName(playlistName)}`
+
+      if (!fs.existsSync(this.dirMusics)) {
+        fs.mkdirSync(this.dirMusics)
+      }
+
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir)
       }
@@ -27,7 +32,7 @@ export class VideoUtilities {
         `${this.dirVideos}/${this.formatName(playlistName)}/${this.formatName(music.name)}.mp4`,
         `${dir}/${this.formatName(music.artist)}_${this.formatName(music.name)}.mp3`,
         (err) => {
-          if (err) throw err
+          if (err) return reject(err)
           fs.unlinkSync(`${this.dirVideos}/${this.formatName(playlistName)}/${this.formatName(music.name)}.mp4`)
           return resolve()
         }
@@ -37,6 +42,10 @@ export class VideoUtilities {
 
   static async downloader (music: Music): Promise<void> {
     const dir = `${this.dirVideos}/${this.formatName(music.playlistName)}`
+
+    if (!fs.existsSync(this.dirVideos)) {
+      fs.mkdirSync(this.dirVideos)
+    }
 
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir)

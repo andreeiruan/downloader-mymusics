@@ -14,7 +14,7 @@ export class GetLinkMusicsQueue {
   private constructor () {
     this.queue = new Bull('GetLinkMusicsQueue', {
       redis: redisConfig,
-      limiter: { max: 1, duration: 200000 }
+      limiter: { max: 5, duration: 200000 }
     })
   }
 
@@ -54,20 +54,25 @@ export class GetLinkMusicsQueue {
       } else {
         const name = musics[i].name
         const artist = musics[i].artist
-        const searchText = `${name.split(' ').join('+')}+${artist.split(' ').join('+')}+audio`
+        const searchText = `${name.split(' ').join('+')}+${artist.split(' ').join('+')}`
         await page.goto(`https://www.youtube.com/results?search_query=${searchText}`)
 
         const link = await page.evaluate(() => {
-          const linkElement = document.getElementById('thumbnail')
-          if (linkElement) {
-            return linkElement.getAttribute('href')
+          const linkElements = document.querySelectorAll('#thumbnail')
+          const linksElementsArray = Array.from(linkElements)
+          const links = linksElementsArray.map(element => element.getAttribute('href'))
+
+          for (const link of links) {
+            const regex = new RegExp(/^\/watch\?v/gm) // eslint-disable-line
+            if (regex.test(link)) {
+              return link
+            }
           }
+
           return undefined
         })
 
-          const regex = new RegExp(/^\/watch\?v/gm) // eslint-disable-line
-
-        if (link && regex.test(link)) {
+        if (link) {
           const musicUpdated = await musicRepository.updateLink(musics[i], link)
           DownloadConvertMusic.instance().add({ music: musicUpdated })
         }
