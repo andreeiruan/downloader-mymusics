@@ -54,7 +54,7 @@ export class GetLinkMusicsQueue {
       } else {
         const name = musics[i].name
         const artist = musics[i].artist
-        const searchText = `${name.split(' ').join('+')}+${artist.split(' ').join('+')}`
+        const searchText = `${name.split(' ').join('+')}+${artist.split(' ').join('+')}+audio`
         await page.goto(`https://www.youtube.com/results?search_query=${searchText}`)
 
         const link = await page.evaluate(() => {
