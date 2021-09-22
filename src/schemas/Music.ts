@@ -14,7 +14,7 @@ export type MusicDocument = Music & Document
 export const MusicSchema = new Schema({
   artist: {
     type: String,
-    required: true
+    required: false
   },
   name: {
     type: String,
