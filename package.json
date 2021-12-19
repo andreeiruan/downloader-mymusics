@@ -11,7 +11,8 @@
     "start:queue": "node dist/queue.js",
     "dev": "npm-run-all -p dev:*",
     "dev:server": "ts-node-dev --ignore-watch node_modules src/server.ts",
-    "dev:queue": "ts-node-dev --ignore-watch node_modules src/queue.ts"
+    "dev:queue": "ts-node-dev --ignore-watch node_modules src/queue.ts",
+    "start-docker": "node dist/server.js && node dist/queue.js"
   },
   "dependencies": {
     "axios": "^0.21.1",

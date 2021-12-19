@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always    
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongodb:/data/db
+    networks: 
+      - downloader
+
+  redisqueue:
+    image: redis:alpine
+    container_name: redisqueue
+    restart: always
+    networks: 
+      - downloader
+    volumes:
+      - redis:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    restart: always
+    container_name: api
+    environment:
+      REDIS_HOST: redisqueue
+      REDIS_PORT: 6379
+      MONGO_HOST: mongodb
+    networks: 
+      - downloader
+    volumes:
+      - $PWD/temp/musics:/temp/musics      
+    command: yarn start
+
+volumes:
+  .:
+  redis:
+  mongodb:
+
+networks:
+  downloader:
+    driver: bridge

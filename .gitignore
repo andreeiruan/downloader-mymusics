@@ -4,3 +4,5 @@ dist/
 *.mp3
 *.mp4
 .vscode/
+data/*
+!.gitkeep

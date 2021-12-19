@@ -45,7 +45,7 @@ export class GetLinkMusicsQueue {
 
     const musicRepository = new MusicRepository(MusicSchema)
 
-    const browser = await puppeteer.launch()
+    const browser = await puppeteer.launch({ headless: true, defaultViewport: { width: 1360, height: 720 }, args: ['--no-sandbox'] })
     const page = await browser.newPage()
 
     for (let i = 0; i <= musics.length - 1; i++) {
