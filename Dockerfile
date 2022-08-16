@@ -10,6 +10,7 @@ RUN  apt-get update \
      && chmod +x /usr/sbin/wait-for-it.sh
 ADD package.json yarn.lock /
 RUN yarn
+RUN yarn add ytdl-core@latest
 COPY . .
 EXPOSE 5000
 ENTRYPOINT yarn start
